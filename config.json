@@ -1,0 +1,15 @@
+{
+    "method": "GET",
+    "url": "http://blazedemo.com",
+    "timeoutSec": 5,
+    "phases": [
+        {
+            "duration": 5,
+            "requestsPerSecond": 5
+        },
+        {
+            "duration": 5,
+            "requestsPerSecond": 0
+        }
+    ]
+}
