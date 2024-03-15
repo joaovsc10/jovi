@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"jovi/helpers"
+	"jovi/src"
 )
 
 func main() {
@@ -15,11 +15,13 @@ func main() {
 		return
 	}
 
-	config, err := helpers.ReadJSONConfig(*jsonFile)
+	config, err := src.ReadJSONConfig(*jsonFile)
 	if err != nil {
 		fmt.Printf("Error reading JSON configuration: %s\n", err)
 		return
 	}
 
-	helpers.RunPerformanceTest(config)
+	src.RunPerformanceTest(config)
+
+	src.GenerateStatistics(config)
 }

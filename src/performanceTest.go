@@ -1,4 +1,4 @@
-package helpers
+package src
 
 import (
 	"fmt"
@@ -10,10 +10,15 @@ import (
 func RunPerformanceTest(config RequestConfig) {
 	var wg sync.WaitGroup
 	var currentVelocity int
+	var previousPhaseDuration int
+
 	totalStart := time.Now()
-	totalDuration := getTotalDuration(config.Phases)
+	totalDuration := GetTotalDuration(config.Phases)
+
+	client := &http.Client{Timeout: time.Duration(config.TimeoutSec) * time.Second}
 
 	var results []RequestResult
+	var failedRequests int
 
 	for _, phase := range config.Phases {
 		increment := float64(phase.RequestsPerSecond-currentVelocity) / float64(phase.Duration)
@@ -25,31 +30,39 @@ func RunPerformanceTest(config RequestConfig) {
 				reqsPerSecond = 0
 			}
 
-			percentage := (float64(i) + getPhaseOffset(phase, config.Phases)) / totalDuration * 100
+			percentage := (float64(i) + float64(previousPhaseDuration)) / totalDuration * 100
 
 			fmt.Printf("Current Velocity: %d requests/second, %.2f%% of test duration passed\n", reqsPerSecond, percentage)
 
+			sem := make(chan struct{}, 1000)
+
 			for j := 0; j < reqsPerSecond; j++ {
+				sem <- struct{}{}
 				wg.Add(1)
 				go func(requestNum int) {
-					defer wg.Done()
+					defer func() {
+						<-sem
+						wg.Done()
+					}()
 
-					start := time.Now()
-					client := &http.Client{Timeout: time.Duration(config.TimeoutSec) * time.Second}
 					req, err := http.NewRequest(config.Method, config.URL, nil)
 					if err != nil {
 						fmt.Printf("Request %d failed to create: %s\n", requestNum, err)
+						failedRequests++
 						return
 					}
 
+					start := time.Now()
 					resp, err := client.Do(req)
+					elapsed := time.Since(start)
+
 					if err != nil {
-						fmt.Printf("Request %d failed: %s\n", requestNum, err)
+						// fmt.Printf("Request %d failed: %s\n", requestNum, err)
+						failedRequests++
 						return
 					}
 					resp.Body.Close()
-					elapsed := time.Since(start)
-					fmt.Printf("Request took %s\n", elapsed)
+					//fmt.Printf("Request took %s\n", elapsed)
 
 					result := RequestResult{
 						Duration:     time.Duration(elapsed.Milliseconds()),
@@ -65,47 +78,16 @@ func RunPerformanceTest(config RequestConfig) {
 			time.Sleep(time.Second)
 		}
 		currentVelocity = phase.RequestsPerSecond
+		previousPhaseDuration += phase.Duration
 	}
 
 	wg.Wait()
 	totalElapsed := time.Since(totalStart)
-	fmt.Printf("Total test duration: %.2fs\n", totalElapsed.Seconds())
+	fmt.Printf("\nTotal test duration: %.2fs\n", totalElapsed.Seconds())
 
-	filename := "output.json"
+	filename := "report/output.json"
 	err := SaveResults(results, filename)
 	if err != nil {
 		fmt.Printf("Error saving results: %v\n", err)
 	}
-}
-
-// computes statistics for response codes over time
-func ComputeResponseCodeStats(results []RequestResult) map[int]int {
-	responseCodeStats := make(map[int]int)
-
-	for _, result := range results {
-		responseCodeStats[result.ResponseCode]++
-	}
-
-	return responseCodeStats
-}
-
-// calculates the total duration of all phases
-func getTotalDuration(phases []Phase) float64 {
-	var totalDuration float64
-	for _, phase := range phases {
-		totalDuration += float64(phase.Duration)
-	}
-	return totalDuration
-}
-
-// calculates the offset of the current phase within the total duration
-func getPhaseOffset(currentPhase Phase, phases []Phase) float64 {
-	var offset float64
-	for _, phase := range phases {
-		if phase == currentPhase {
-			break
-		}
-		offset += float64(phase.Duration)
-	}
-	return offset
 }

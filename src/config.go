@@ -1,4 +1,4 @@
-package helpers
+package src
 
 import (
 	"encoding/json"
@@ -7,10 +7,17 @@ import (
 )
 
 type RequestConfig struct {
-	Method     string  `json:"method"`
-	URL        string  `json:"url"`
-	TimeoutSec int     `json:"timeoutSec"`
-	Phases     []Phase `json:"phases"`
+	Method            string            `json:"method"`
+	URL               string            `json:"url"`
+	TimeoutSec        int               `json:"timeoutSec"`
+	Phases            []Phase           `json:"phases"`
+	ExpectedStatus    int               `json:"expectedStatus"`
+	PassingConditions PassingConditions `json:"passingConditions"`
+}
+
+type PassingConditions struct {
+	SuccessRate    string `json:"successRate"`
+	ResponseTime95 string `json:"responseTime95"`
 }
 
 type Phase struct {
