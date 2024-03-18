@@ -86,3 +86,17 @@ You will be able to generate an HTML report automatically at the end of the exec
 
 <p align="center"><img src="./images/report_summary.png" alt="Summary"/></a></p>
 <p align="center"><img src="./images/report_plots.png" alt="Plots" /></a></p>
+
+## Roadmap
+
+Here are the next steps to improve the tool:
+- [ ] Accept other HTTP methods
+- [ ] Improve the code that produces the load
+  - [ ] Should a specific stage have the req/second rate proporcional to the capacity of the buffered channel?
+  - [ ] For a very high rate, the stage takes longer than expected to complece, since it waits for all requests to be made
+- [ ] Improve code error handling
+- [ ] Add tests
+- [ ] Add behaviour to handle timeout requests
+- [ ] Add more request metrics (failed rate, VU usage, ...) -> Check k6 default console output
+- [ ] Should we allow logic to be executed before the request (setup)?
+- [ ] For now, the test is executed within the tool. We should make this a public package.
