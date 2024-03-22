@@ -1,6 +1,6 @@
-module jovi
+module github.com/joaovsc10/jovi
 
-go 1.20
+go 1.22
 
 require gonum.org/v1/plot v0.14.0
 
