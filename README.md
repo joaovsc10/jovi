@@ -1,6 +1,6 @@
 # Jovi
 
-<p align="center"><img src="./images/logo.jpeg" alt="jovi" width="400" height="400" /></a></p>
+<p align="center"><img src="https://github.com/joaovsc10/jovi/assets/4793869/a325f7fc-2d44-4abd-8a5a-b6c9dba49672" alt="jovi" width="400" height="400" /></a></p>
 
 Jovi is a performance testing tool for HTTP endpoints. 
 
@@ -84,8 +84,8 @@ Example configuration file:
 
 You will be able to generate an HTML report automatically at the end of the execution, that will look like the images below:
 
-<p align="center"><img src="./images/report_summary.png" alt="Summary"/></a></p>
-<p align="center"><img src="./images/report_plots.png" alt="Plots" /></a></p>
+<p align="center"><img src="https://github.com/joaovsc10/jovi/assets/4793869/ca8c620f-8ea5-4e9b-895a-ae976089be4a" alt="Summary"/></a></p>
+<p align="center"><img src="https://github.com/joaovsc10/jovi/assets/4793869/3ce02ee3-8937-45d4-bc75-20bcf0cd853c" alt="Plots" /></a></p>
 
 ## Roadmap
 
